@@ -27,7 +27,8 @@ int main(int argc, char *argv[]) {
 
     int fd[2 * NUM_PIPES];    //Declare int[] of file descriptors
 
-    int len, i;             //Declare length and integer for count
+    int len = 0;
+    int i;             //Declare length and integer for count
 
     pid_t pid;              //Declare process id
 
@@ -116,7 +117,7 @@ int main(int argc, char *argv[]) {
     }
 
     // now wait for a response
-    len = read(fd[P1_READ], &parent, strlen(parent));
+    len = (int) read(fd[P1_READ], &parent, strlen(parent));
     if (len < 0) {
         perror("Parent: failed to read value from pipe");
         exit(EXIT_FAILURE);
