@@ -20,6 +20,10 @@
 // the total number of pipe *pairs* we need
 #define NUM_PIPES   2
 
+//TODO: Create function for sharing of integer array
+//TODO: Create an array of size N
+//TODO: Create function to calculate the distance between all integer values
+
 bool isNumber(char const number[]) {
     int i = 0;
 
@@ -122,7 +126,6 @@ int main(int argc, char *argv[]) {
 
             // send the message to toggleString and write it to pipe//
             //if (write(fd[P2_WRITE], toggleString(child), strlen(child)) < 0)
-            //TODO: Create function for sharing of integer array
 
             {
                 perror("Child: Failed to write response value");
