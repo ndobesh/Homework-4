@@ -1,9 +1,13 @@
+#pragma clang diagnostic push
+#pragma ide diagnostic ignored "hicpp-signed-bitwise"
 #include <stdlib.h>
 #include <sys/wait.h>
 #include <unistd.h>
 #include <stdio.h>
 #include <memory.h>
 #include <assert.h>
+#include <stdbool.h>
+#include <ctype.h>
 
 
 //Skeleton for program comes from...
@@ -16,6 +20,26 @@
 // the total number of pipe *pairs* we need
 #define NUM_PIPES   2
 
+bool isNumber(char const number[]) {
+    int i = 0;
+
+    //checking for negative numbers
+    if (number[0] == '-')
+        i = 1;
+    for (; number[i] != 0; i++) {
+        //if (number[i] > '9' || number[i] < '0')
+        if (!isdigit(number[i]))
+            return false;
+    }
+    return true;
+}
+
+void usage() {
+    printf("usage:\t Pipes array_size datafile\n"
+           "array_size:\t How much array will need to be filled up before sending via pipe\n"
+           "datafile:\t name of file with numbers to be used\n");
+}
+
 /*
 Main takes input from command line, calls input validation to make sure of proper input,
 then creates the pipes we will need and the forks the child process, Parent and Child
@@ -25,6 +49,19 @@ int main(int argc, char *argv[]) {
 
     assert(argc > 1);
 
+    //Input Validation
+    if (argc != 3) {
+        usage();
+        exit(EXIT_FAILURE);
+    }
+
+    if (!isNumber(argv[1])) {
+        fprintf(stderr, "Non-integer value inputted\n");
+        usage();
+        exit(1);
+    }
+    //Input validation complete.
+
     int fd[2 * NUM_PIPES];    //Declare int[] of file descriptors
 
     int len = 0;
@@ -32,12 +69,16 @@ int main(int argc, char *argv[]) {
 
     pid_t pid;              //Declare process id
 
-    char parent[strlen(argv[1])];   //Declare Parent array
+    //Converting argv[1] to integer value that program can use
+    char *p;
 
-    char child[strlen(argv[1])];    //Declare Child array
+    long conv = strtol(argv[1], &p, 10);
+    int array_size = (int) conv;
 
-    //if(inputValidation(argc, argv) == 0) /* Check for proper input */
-    //TODO: Create validation fuction
+    char parent[array_size];   //Declare Parent array
+    printf("Parent array has %d elements", (int) strlen(parent));
+
+    char child[array_size];    //Declare Child array
 
     strcpy(parent, argv[1]);
 
@@ -73,11 +114,11 @@ int main(int argc, char *argv[]) {
             exit(EXIT_FAILURE);
         } else if (len == 0) {
             // not an error, but certainly unexpected
-            fprintf(stderr, "Child: Read EOF from pipe");
+            fprintf(stderr, "Child: Read EOF from pipe\n\n");
         } else {
 
             // report pid to console
-            printf("Child(%d): Recieved Message\n\nChild(%d): Toggling Case and Sending to Parent\n", pid, pid);
+            printf("Child(%d): Received Message\n\nChild(%d): Sending to Parent\n", pid, pid);
 
             // send the message to toggleString and write it to pipe//
             //if (write(fd[P2_WRITE], toggleString(child), strlen(child)) < 0)
@@ -119,11 +160,11 @@ int main(int argc, char *argv[]) {
     // now wait for a response
     len = (int) read(fd[P1_READ], &parent, strlen(parent));
     if (len < 0) {
-        perror("Parent: failed to read value from pipe");
+        perror("Parent: failed to read value from pipe\n\n");
         exit(EXIT_FAILURE);
     } else if (len == 0) {
         // not an error, but certainly unexpected
-        fprintf(stderr, "Parent(%d): Read EOF from pipe", pid);
+        fprintf(stderr, "Parent(%d): Read EOF from pipe\n\n", pid);
     } else {
         // report what we received
         printf("\nParent(%d): Received %s from Child\n\n", pid, parent);
@@ -141,3 +182,5 @@ int main(int argc, char *argv[]) {
 }
 //////////////////////////////Parent Code ENDS//////////////////////////////////
 //////////////////////////////////////////////////////////////////////////////////
+
+#pragma clang diagnostic pop
