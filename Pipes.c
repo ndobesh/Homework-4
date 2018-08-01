@@ -21,7 +21,6 @@
 #define NUM_PIPES   2
 
 //TODO: Create function for sharing of integer array
-//TODO: Create an array of size N
 //TODO: Create function to calculate the distance between all integer values
 
 bool isNumber(char const number[]) {
@@ -51,6 +50,15 @@ execute they're respective code
 */
 int main(int argc, char *argv[]) {
 
+    char *p;
+    long conv = strtol(argv[2], &p, 10);
+    int N = (int) conv;
+
+    FILE *myFile = fopen(argv[1], "r");
+    if (myFile == NULL) {
+        fprintf(stderr, "Failed to open file\n");
+        exit(1);
+    }
     assert(argc > 1);
 
     //Input Validation
@@ -74,10 +82,10 @@ int main(int argc, char *argv[]) {
     pid_t pid;              //Declare process id
 
     //Converting argv[1] to integer value that program can use
-    char *p;
+    char *c;
 
-    long conv = strtol(argv[1], &p, 10);
-    int array_size = (int) conv;
+    long convs = strtol(argv[1], &c, 10);
+    int array_size = (int) convs;
 
     char parent[array_size];   //Declare Parent array
     printf("Parent array has %d elements", (int) strlen(parent));
@@ -124,8 +132,9 @@ int main(int argc, char *argv[]) {
             // report pid to console
             printf("Child(%d): Received Message\n\nChild(%d): Sending to Parent\n", pid, pid);
 
-            // send the message to toggleString and write it to pipe//
-            //if (write(fd[P2_WRITE], toggleString(child), strlen(child)) < 0)
+            while (fscanf(myFile, "%d", &N) == 1) {
+                printf("Hello World!");
+            }
 
             {
                 perror("Child: Failed to write response value");
